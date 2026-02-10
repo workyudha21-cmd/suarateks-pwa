@@ -251,6 +251,13 @@ body.elderly-mode .btn-danger {
   border-color: #FF0000;
 }
 
+body.elderly-mode .controls button {
+  min-width: 160px;
+  /* Ensure uniform width */
+  justify-content: center;
+  gap: 12px;
+}
+
 body.elderly-mode header {
   border-bottom: 2px solid #FFFF00;
 }
