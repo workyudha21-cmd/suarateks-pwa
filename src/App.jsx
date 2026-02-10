@@ -131,18 +131,18 @@ function App() {
               disabled={!isOnline}
               style={{ opacity: !isOnline ? 0.5 : 1, cursor: !isOnline ? 'not-allowed' : 'pointer' }}
             >
-              <Mic size={isElderlyMode ? 32 : 24} />
+              <Mic size={isElderlyMode ? 36 : 24} />
               {isElderlyMode ? "MULAI BICARA" : "Mulai"}
             </button>
           ) : (
             <button className="btn-danger" onClick={stopListening}>
-              <MicOff size={isElderlyMode ? 32 : 24} />
+              <MicOff size={isElderlyMode ? 36 : 24} />
               {isElderlyMode ? "BERHENTI" : "Berhenti"}
             </button>
           )}
 
           <button className="btn-secondary" onClick={clearTranscript} disabled={isListening}>
-            <Trash2 size={isElderlyMode ? 32 : 24} />
+            <Trash2 size={isElderlyMode ? 36 : 24} />
             {isElderlyMode ? "HAPUS" : "Hapus"}
           </button>
         </div>
