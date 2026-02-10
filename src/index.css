@@ -214,3 +214,41 @@ button:active {
     /* Prevent becoming too small */
   }
 }
+/* Elderly Mode (High Contrast & Big Text) */
+body.elderly-mode {
+  --bg-color: #000000;
+  --text-color: #FFFF00; /* Yellow */
+  --surface-color: #000000;
+  --accent-color: #FFFF00;
+  --font-size-base: 24px;
+  --font-size-large: 36px;
+}
+
+body.elderly-mode .transcript-container {
+  border: 2px solid #FFFF00;
+}
+
+body.elderly-mode .interim-text {
+  color: #FFA500; /* Orange for interim */
+}
+
+body.elderly-mode button {
+  border: 2px solid #FFFF00;
+  font-size: 1.5rem;
+  padding: 1.5rem 2rem;
+}
+
+body.elderly-mode .btn-primary {
+  background-color: #FFFF00;
+  color: #000000;
+}
+
+body.elderly-mode .btn-danger {
+  background-color: #FF0000;
+  color: #FFFFFF;
+  border-color: #FF0000;
+}
+
+body.elderly-mode header {
+  border-bottom: 2px solid #FFFF00;
+}
