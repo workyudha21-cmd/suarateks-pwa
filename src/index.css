@@ -38,9 +38,14 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  /* Fallback */
+  height: 100dvh;
+  /* Mobile browser friendly */
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
+  overflow: hidden;
+  /* Prevent body scroll */
 }
 
 header {
@@ -176,6 +181,8 @@ button:active {
 
   #root {
     padding: 0.5rem;
+    padding-bottom: 1rem;
+    /* Extra padding for bottom safe area */
   }
 
   header {
