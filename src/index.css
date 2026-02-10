@@ -133,13 +133,12 @@ button:active {
 }
 
 .status-indicator {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   width: 12px;
   height: 12px;
   border-radius: 50%;
   background-color: #ccc;
+  flex-shrink: 0;
+  /* Prevent shrinking in flex container */
 }
 
 .status-indicator.listening {
@@ -214,10 +213,12 @@ button:active {
     /* Prevent becoming too small */
   }
 }
+
 /* Elderly Mode (High Contrast & Big Text) */
 body.elderly-mode {
   --bg-color: #000000;
-  --text-color: #FFFF00; /* Yellow */
+  --text-color: #FFFF00;
+  /* Yellow */
   --surface-color: #000000;
   --accent-color: #FFFF00;
   --font-size-base: 24px;
@@ -229,7 +230,8 @@ body.elderly-mode .transcript-container {
 }
 
 body.elderly-mode .interim-text {
-  color: #FFA500; /* Orange for interim */
+  color: #FFA500;
+  /* Orange for interim */
 }
 
 body.elderly-mode button {
