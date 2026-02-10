@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
-import { Mic, MicOff, Trash2, WifiOff, Eye, EyeOff } from 'lucide-react';
+import { Mic, MicOff, Trash2, WifiOff, ZoomIn, ZoomOut } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -74,10 +74,10 @@ function App() {
           <button 
             className="btn-secondary" 
             onClick={() => setIsElderlyMode(!isElderlyMode)}
-            style={{ padding: '0.5rem', fontSize: '1rem' }}
-            aria-label="Mode Lansia"
+            style={{ padding: '0.5rem', fontSize: '1rem', minWidth: 'auto' }}
+            aria-label={isElderlyMode ? "Keluar Mode Lansia" : "Masuk Mode Lansia"}
           >
-            {isElderlyMode ? <EyeOff size={24}/> : <Eye size={24}/>}
+            {isElderlyMode ? <ZoomOut size={24}/> : <ZoomIn size={24}/>}
           </button>
           <div className={`status-indicator ${isListening ? 'listening' : ''}`}></div>
         </div>
