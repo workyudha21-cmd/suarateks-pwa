@@ -143,14 +143,67 @@ button:active {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
+
 
 .empty-state {
   text-align: center;
   color: #888;
   margin-top: 2rem;
   font-style: italic;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 600px) {
+  :root {
+    --font-size-base: 16px;
+    --font-size-large: 20px;
+  }
+
+  #root {
+    padding: 0.5rem;
+  }
+
+  header {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .transcript-container {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  button {
+    flex: 1;
+    /* Buttons take equal width */
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    justify-content: center;
+    min-width: 120px;
+    /* Prevent becoming too small */
+  }
 }
