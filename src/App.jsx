@@ -3,6 +3,8 @@ import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { Mic, MicOff, Trash2 } from 'lucide-react';
 import './index.css';
 
+import { WifiOff } from 'lucide-react';
+
 function App() {
   const { 
     isListening, 
@@ -15,6 +17,20 @@ function App() {
   } = useSpeechRecognition();
 
   const [wakeLock, setWakeLock] = useState(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Request Wake Lock to prevent screen from sleeping
   useEffect(() => {
@@ -57,7 +73,14 @@ function App() {
             </div>
           ) : (
             <div className="empty-state">
-              Tekan tombol mikrofon dan mulai berbicara...
+              {!isOnline ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                  <WifiOff size={48} color="var(--error-color)" />
+                  <p>Koneksi internet terputus.<br/>Fitur ini membutuhkan internet.</p>
+                </div>
+              ) : (
+                "Tekan tombol mikrofon dan mulai berbicara..."
+              )}
             </div>
           )}
         </div>
@@ -68,9 +91,28 @@ function App() {
           </div>
         )}
 
+        {!isOnline && (
+          <div style={{ 
+            backgroundColor: '#fee2e2', 
+            color: '#dc2626', 
+            padding: '0.75rem', 
+            borderRadius: '8px',
+            textAlign: 'center',
+            marginBottom: '1rem',
+            fontSize: '0.9rem'
+          }}>
+            <strong>Offline Mode:</strong> Aplikasi tetap bisa dibuka, tapi pengubah suara tidak aktif.
+          </div>
+        )}
+
         <div className="controls">
           {!isListening ? (
-            <button className="btn-primary" onClick={startListening}>
+            <button 
+              className="btn-primary" 
+              onClick={startListening}
+              disabled={!isOnline}
+              style={{ opacity: !isOnline ? 0.5 : 1, cursor: !isOnline ? 'not-allowed' : 'pointer' }}
+            >
               <Mic size={24} />
               Mulai
             </button>
