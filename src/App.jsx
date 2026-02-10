@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
-import { Mic, MicOff, Trash2 } from 'lucide-react';
+import { Mic, MicOff, Trash2, WifiOff, Eye, EyeOff } from 'lucide-react';
 import './index.css';
-
-import { WifiOff } from 'lucide-react';
 
 function App() {
   const { 
@@ -18,6 +16,16 @@ function App() {
 
   const [wakeLock, setWakeLock] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isElderlyMode, setIsElderlyMode] = useState(false);
+
+  // Toggle Elderly Mode class on body
+  useEffect(() => {
+    if (isElderlyMode) {
+      document.body.classList.add('elderly-mode');
+    } else {
+      document.body.classList.remove('elderly-mode');
+    }
+  }, [isElderlyMode]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -61,8 +69,18 @@ function App() {
   return (
     <>
       <header>
-        <h1>SuaraTeks</h1>
-        <div className={`status-indicator ${isListening ? 'listening' : ''}`}></div>
+        <h1>{isElderlyMode ? "Suara Ke Teks" : "SuaraTeks"}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button 
+            className="btn-secondary" 
+            onClick={() => setIsElderlyMode(!isElderlyMode)}
+            style={{ padding: '0.5rem', fontSize: '1rem' }}
+            aria-label="Mode Lansia"
+          >
+            {isElderlyMode ? <EyeOff size={24}/> : <Eye size={24}/>}
+          </button>
+          <div className={`status-indicator ${isListening ? 'listening' : ''}`}></div>
+        </div>
       </header>
 
       <main>
@@ -79,7 +97,7 @@ function App() {
                   <p>Koneksi internet terputus.<br/>Fitur ini membutuhkan internet.</p>
                 </div>
               ) : (
-                "Tekan tombol mikrofon dan mulai berbicara..."
+                isElderlyMode ? "Tekan MULAI dan bicara..." : "Tekan tombol mikrofon dan mulai berbicara..."
               )}
             </div>
           )}
@@ -113,19 +131,19 @@ function App() {
               disabled={!isOnline}
               style={{ opacity: !isOnline ? 0.5 : 1, cursor: !isOnline ? 'not-allowed' : 'pointer' }}
             >
-              <Mic size={24} />
-              Mulai
+              <Mic size={isElderlyMode ? 32 : 24} />
+              {isElderlyMode ? "MULAI BICARA" : "Mulai"}
             </button>
           ) : (
             <button className="btn-danger" onClick={stopListening}>
-              <MicOff size={24} />
-              Berhenti
+              <MicOff size={isElderlyMode ? 32 : 24} />
+              {isElderlyMode ? "BERHENTI" : "Berhenti"}
             </button>
           )}
 
           <button className="btn-secondary" onClick={clearTranscript} disabled={isListening}>
-            <Trash2 size={24} />
-            Hapus
+            <Trash2 size={isElderlyMode ? 32 : 24} />
+            {isElderlyMode ? "HAPUS" : "Hapus"}
           </button>
         </div>
       </main>
