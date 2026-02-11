@@ -42,11 +42,24 @@ export const useSpeechRecognition = () => {
             }
 
             // Combine base transcript with current session's final result
-            const base = transcriptBaseRef.current;
-            // Add newline if base serves as prefix and is not empty
-            const separator = (base && currentSessionFinal) ? '\n\n' : '';
+            // Deduplication Logic:
+            const base = transcriptBaseRef.current || '';
+            const cleanBase = base.trim();
+            const cleanCurrent = currentSessionFinal.trim();
 
-            setTranscript(base + separator + currentSessionFinal);
+            let finalTranscript = '';
+
+            // Check if currLast (current session text) starts with base.
+            // If so, the engine kept history, so we use current directly.
+            if (cleanBase && cleanCurrent.startsWith(cleanBase)) {
+                finalTranscript = currentSessionFinal;
+            } else {
+                // Engine cleared history, standard append
+                const separator = (base && currentSessionFinal) ? '\n\n' : '';
+                finalTranscript = base + separator + currentSessionFinal;
+            }
+
+            setTranscript(finalTranscript);
             setInterimTranscript(currentSessionInterim);
         };
 
