@@ -47,16 +47,39 @@ export const useSpeechRecognition = () => {
             const cleanBase = base.trim();
             const cleanCurrent = currentSessionFinal.trim();
 
+            const lowerBase = cleanBase.toLowerCase();
+            const lowerCurrent = cleanCurrent.toLowerCase();
+
             let finalTranscript = '';
 
-            // Check if currLast (current session text) starts with base.
-            // If so, the engine kept history, so we use current directly.
-            if (cleanBase && cleanCurrent.startsWith(cleanBase)) {
+            // Check 1: Full History Match (Case Insensitive)
+            if (cleanBase && lowerCurrent.startsWith(lowerBase)) {
                 finalTranscript = currentSessionFinal;
-            } else {
-                // Engine cleared history, standard append
-                const separator = (base && currentSessionFinal) ? '\n\n' : '';
-                finalTranscript = base + separator + currentSessionFinal;
+            }
+            // Check 2: Tail Overlap Match (Case Insensitive)
+            else {
+                const lastBaseSegment = cleanBase.split('\n\n').pop()?.trim();
+                const lowerLastSegment = lastBaseSegment?.toLowerCase();
+
+                if (lowerLastSegment && lowerCurrent.startsWith(lowerLastSegment)) {
+                    // The last segment of base is repeated at the start of current (ignoring case).
+                    // We find where that segment matches in the *original* base string to preserver casing if needed,
+                    // but for simplicity and safety, we just slice based on length of the match.
+
+                    // Find index of the last segment in the base
+                    const lastIndex = cleanBase.lastIndexOf(lastBaseSegment);
+
+                    // Prefix is everything before that last segment
+                    const basePrefix = cleanBase.substring(0, lastIndex).trim();
+                    const separator = basePrefix ? '\n\n' : '';
+
+                    // We use the NEW content (currentSessionFinal) as the authority for the overlap part
+                    finalTranscript = basePrefix + separator + currentSessionFinal;
+                } else {
+                    // No overlap detected. Standard append.
+                    const separator = (base && currentSessionFinal) ? '\n\n' : '';
+                    finalTranscript = base + separator + currentSessionFinal;
+                }
             }
 
             setTranscript(finalTranscript);
