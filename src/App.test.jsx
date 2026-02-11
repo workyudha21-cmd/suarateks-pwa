@@ -25,7 +25,7 @@ Object.defineProperty(navigator, 'wakeLock', {
 describe('App', () => {
   it('renders the title', () => {
     render(<App />);
-    expect(screen.getByText(/SuaraTeks/i)).toBeInTheDocument();
+    expect(screen.getByText(/BantuDengar/i)).toBeInTheDocument();
   });
 
   it('shows start button initially', () => {

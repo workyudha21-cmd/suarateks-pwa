@@ -219,14 +219,34 @@ body.elderly-mode {
   --bg-color: #000000;
   --text-color: #FFFF00;
   /* Yellow */
-  --surface-color: #000000;
+  --surface-color: #1a1a1a;
   --accent-color: #FFFF00;
-  --font-size-base: 24px;
-  --font-size-large: 36px;
+  --font-size-base: 28px;
+  --font-size-large: 42px;
 }
 
 body.elderly-mode .transcript-container {
-  border: 2px solid #FFFF00;
+  border: 4px solid #333;
+}
+
+/* Visual Cue for Listening in Elderly Mode */
+body.elderly-mode .transcript-container.active-listening {
+  border-color: #ff0000;
+  animation: borderPulse 1.5s infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
 }
 
 body.elderly-mode .interim-text {
@@ -235,9 +255,12 @@ body.elderly-mode .interim-text {
 }
 
 body.elderly-mode button {
-  border: 2px solid #FFFF00;
-  font-size: 1.5rem;
-  padding: 1.5rem 2rem;
+  border: 3px solid #FFFF00;
+  font-size: 2rem;
+  padding: 1.5rem 3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 body.elderly-mode .btn-primary {
@@ -249,15 +272,95 @@ body.elderly-mode .btn-danger {
   background-color: #FF0000;
   color: #FFFFFF;
   border-color: #FF0000;
+  /* Removed pulse animation per user request */
 }
 
 body.elderly-mode .controls button {
-  min-width: 160px;
+  min-width: 220px;
   /* Ensure uniform width */
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 body.elderly-mode header {
-  border-bottom: 2px solid #FFFF00;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Keyboard Overlay */
+.keyboard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-color);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.keyboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.text-input {
+  flex: 1;
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 1rem;
+  border: 2px solid var(--surface-color);
+  border-radius: 8px;
+  resize: none;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.keyboard-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-speak {
+  flex: 2;
+  font-size: 1.5rem;
+  padding: 1rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  color: var(--text-color);
+}
+
+/* Elderly Mode Keyboard */
+.elderly-keyboard {
+  background-color: #000000;
+  color: #FFFF00;
+}
+
+.elderly-keyboard .text-input {
+  background-color: #000;
+  color: #FFFF00;
+  border: 4px solid #FFFF00;
+  font-size: 2.5rem;
+}
+
+.elderly-keyboard .btn-speak {
+  background-color: #FFFF00;
+  color: #000;
+  font-weight: 800;
+  border: 3px solid #FFFF00;
+}
+
+.elderly-keyboard .btn-icon {
+  color: #FFFF00;
 }

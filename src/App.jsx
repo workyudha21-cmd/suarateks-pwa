@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
-import { Mic, MicOff, Trash2, WifiOff, ZoomIn, ZoomOut } from 'lucide-react';
+import { Mic, MicOff, Trash2, WifiOff, ZoomIn, ZoomOut, Keyboard, X, Volume2 } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -17,6 +17,8 @@ function App() {
   const [wakeLock, setWakeLock] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isElderlyMode, setIsElderlyMode] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [textToSpeak, setTextToSpeak] = useState('');
 
   // Toggle Elderly Mode class on body
   useEffect(() => {
@@ -66,11 +68,30 @@ function App() {
     }
   }, [isListening]);
 
+  const speakText = (text) => {
+    if (!text) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID';
+    utterance.rate = 0.9; // Slightly slower for clarity
+    window.speechSynthesis.speak(utterance);
+    
+    if (navigator.vibrate) navigator.vibrate(100);
+  };
+
   return (
     <>
       <header>
-        <h1>{isElderlyMode ? "Suara Ke Teks" : "SuaraTeks"}</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {!isElderlyMode && <h1>BantuDengar</h1>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: isElderlyMode ? 'auto' : '0' }}>
+          <button 
+            className="btn-secondary" 
+            onClick={() => setShowKeyboard(true)}
+            style={{ padding: '0.5rem', fontSize: '1rem', minWidth: 'auto' }}
+            aria-label="Mode Bicara (Keyboard)"
+          >
+            <Keyboard size={24}/>
+          </button>
+          
           <button 
             className="btn-secondary" 
             onClick={() => setIsElderlyMode(!isElderlyMode)}
@@ -84,9 +105,9 @@ function App() {
       </header>
 
       <main>
-        <div className="transcript-container">
+        <div className={`transcript-container ${isListening ? 'active-listening' : ''}`}>
           {transcript || interimTranscript ? (
-            <div className="transcript-text">
+            <div className="transcript-text" style={{ whiteSpace: 'pre-wrap' }}>
               {transcript} <span className="interim-text">{interimTranscript}</span>
             </div>
           ) : (
@@ -97,7 +118,7 @@ function App() {
                   <p>Koneksi internet terputus.<br/>Fitur ini membutuhkan internet.</p>
                 </div>
               ) : (
-                isElderlyMode ? "Tekan MULAI dan bicara..." : "Tekan tombol mikrofon dan mulai berbicara..."
+                isElderlyMode ? "TEKAN TOMBOL KUNING UNTUK MULAI" : "Tekan tombol mikrofon dan mulai berbicara..."
               )}
             </div>
           )}
@@ -127,26 +148,69 @@ function App() {
           {!isListening ? (
             <button 
               className="btn-primary" 
-              onClick={startListening}
+              onClick={() => {
+                if (navigator.vibrate) navigator.vibrate(200);
+                startListening();
+              }}
               disabled={!isOnline}
               style={{ opacity: !isOnline ? 0.5 : 1, cursor: !isOnline ? 'not-allowed' : 'pointer' }}
             >
-              <Mic size={isElderlyMode ? 36 : 24} />
-              {isElderlyMode ? "MULAI BICARA" : "Mulai"}
+              <Mic size={isElderlyMode ? 48 : 24} />
+              {isElderlyMode ? "MULAI" : "Mulai"}
             </button>
           ) : (
-            <button className="btn-danger" onClick={stopListening}>
-              <MicOff size={isElderlyMode ? 36 : 24} />
+            <button className="btn-danger" onClick={() => {
+                if (navigator.vibrate) navigator.vibrate(200);
+                stopListening();
+            }}>
+              <MicOff size={isElderlyMode ? 48 : 24} />
               {isElderlyMode ? "BERHENTI" : "Berhenti"}
             </button>
           )}
 
           <button className="btn-secondary" onClick={clearTranscript} disabled={isListening}>
-            <Trash2 size={isElderlyMode ? 36 : 24} />
+            <Trash2 size={isElderlyMode ? 48 : 24} />
             {isElderlyMode ? "HAPUS" : "Hapus"}
           </button>
         </div>
       </main>
+
+      {/* Keyboard Modal Overlay */}
+      {showKeyboard && (
+        <div className={`keyboard-overlay ${isElderlyMode ? 'elderly-keyboard' : ''}`}>
+          <div className="keyboard-header">
+            <h2>Ketik untuk Bicara</h2>
+            <button className="btn-icon" onClick={() => setShowKeyboard(false)}>
+              <X size={32} />
+            </button>
+          </div>
+          
+          <textarea 
+            value={textToSpeak}
+            onChange={(e) => setTextToSpeak(e.target.value)}
+            placeholder="Ketik pesan anda disini..."
+            className="text-input"
+            autoFocus
+          />
+          
+          <div className="keyboard-actions">
+            <button 
+              className="btn-primary btn-speak"
+              onClick={() => speakText(textToSpeak)}
+            >
+              <Volume2 size={32} />
+              BICARA
+            </button>
+            <button 
+              className="btn-secondary"
+              onClick={() => setTextToSpeak('')}
+            >
+              <Trash2 size={32} />
+              Hapus
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

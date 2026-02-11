@@ -6,6 +6,8 @@ export const useSpeechRecognition = () => {
     const [interimTranscript, setInterimTranscript] = useState('');
     const [error, setError] = useState(null);
     const recognitionRef = useRef(null);
+    // Ref to store the transcript from previous sessions
+    const transcriptBaseRef = useRef('');
 
     useEffect(() => {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -18,7 +20,7 @@ export const useSpeechRecognition = () => {
 
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'id-ID'; // Default ke Bahasa Indonesia
+        recognition.lang = 'id-ID'; // Default to Indonesian
 
         recognition.onstart = () => {
             setIsListening(true);
@@ -26,21 +28,26 @@ export const useSpeechRecognition = () => {
         };
 
         recognition.onresult = (event) => {
-            let finalTrans = '';
-            let interimTrans = '';
+            let currentSessionFinal = '';
+            let currentSessionInterim = '';
 
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
+            // Iterate through ALL results of the current session
+            for (let i = 0; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
-                    finalTrans += event.results[i][0].transcript;
+                    const prefix = currentSessionFinal ? '\n\n' : '';
+                    currentSessionFinal += prefix + event.results[i][0].transcript;
                 } else {
-                    interimTrans += event.results[i][0].transcript;
+                    currentSessionInterim += event.results[i][0].transcript;
                 }
             }
 
-            if (finalTrans) {
-                setTranscript((prev) => prev + ' ' + finalTrans);
-            }
-            setInterimTranscript(interimTrans);
+            // Combine base transcript with current session's final result
+            const base = transcriptBaseRef.current;
+            // Add newline if base serves as prefix and is not empty
+            const separator = (base && currentSessionFinal) ? '\n\n' : '';
+
+            setTranscript(base + separator + currentSessionFinal);
+            setInterimTranscript(currentSessionInterim);
         };
 
         recognition.onerror = (event) => {
@@ -49,17 +56,11 @@ export const useSpeechRecognition = () => {
                 setError('Akses mikrofon ditolak.');
                 setIsListening(false);
             } else {
-                // Ignore other errors for now or handle them
+                // Ignore other errors
             }
         };
 
         recognition.onend = () => {
-            // Auto-restart if it was supposed to be listening (for continuous effect)
-            // But for now, let's just update state. 
-            // User might want to toggle manually.
-            // If we want "always on", we need to restart here if isListening was meant to be true.
-            // Getting strict "isListening" state tracking is tricky with auto-restart.
-            // We'll let UI control start/stop for MVP clarity.
             setIsListening(false);
         };
 
@@ -75,29 +76,39 @@ export const useSpeechRecognition = () => {
     const manualStop = useCallback(() => {
         if (recognitionRef.current) {
             recognitionRef.current.stop();
-            setIsListening(false);
+            // Do NOT set isListening(false) here. 
+            // Wait for 'onend' to fire to ensure the engine has fully stopped.
+            // This prevents race conditions where user can click Start again too early.
         }
     }, []);
 
     const startListening = useCallback(() => {
         if (recognitionRef.current && !isListening) {
             try {
+                // Snapshot current transcript as base for the new session
+                transcriptBaseRef.current = transcript;
                 recognitionRef.current.start();
                 setIsListening(true);
             } catch (e) {
-                console.error("Start error", e);
+                // Handle case where browser thinks it's already started but React state disagrees
+                if (e.name === 'InvalidStateError' || e.message.includes('already started')) {
+                    console.warn("Speech recognition was already started. Syncing state.");
+                    setIsListening(true);
+                } else {
+                    console.error("Start error", e);
+                }
             }
         }
-    }, [isListening]);
+    }, [isListening, transcript]);
 
     const stopListening = useCallback(() => {
-        // Actually stop recognition
         manualStop();
     }, [manualStop]);
 
     const clearTranscript = useCallback(() => {
         setTranscript('');
         setInterimTranscript('');
+        transcriptBaseRef.current = '';
     }, []);
 
     return {

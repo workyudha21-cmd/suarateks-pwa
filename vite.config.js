@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'SuaraTeks - Bantu Dengar',
-        short_name: 'SuaraTeks',
-        description: 'Ubah suara menjadi teks untuk membantu komunikasi.',
+        name: 'BantuDengar - Alat Bantu Komunikasi',
+        short_name: 'BantuDengar',
+        description: 'Ubah suara menjadi teks untuk membantu komunikasi tuna rungu dan lansia.',
         theme_color: '#ffffff',
         icons: [
           {
