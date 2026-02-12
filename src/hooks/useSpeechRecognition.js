@@ -32,14 +32,38 @@ export const useSpeechRecognition = () => {
             let currentSessionInterim = '';
 
             // Iterate through ALL results of the current session
+            // Iterate through ALL results of the current session
+            const currentFinals = [];
             for (let i = 0; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
-                    const prefix = currentSessionFinal ? '\n\n' : '';
-                    currentSessionFinal += prefix + event.results[i][0].transcript;
+                    currentFinals.push(event.results[i][0].transcript);
                 } else {
                     currentSessionInterim += event.results[i][0].transcript;
                 }
             }
+
+            // Deduplicate accumulated finals (Fix for Android Chrome text repetition)
+            // On Android Chrome, the engine often emits expanding segments as separate finals:
+            // e.g. "Hello", then "Hello World"
+            const uniqueFinals = currentFinals.reduce((acc, curr) => {
+                if (acc.length === 0) return [curr];
+
+                const prev = acc[acc.length - 1];
+                const lowerPrev = prev.toLowerCase().trim();
+                const lowerCurr = curr.toLowerCase().trim();
+
+                // If the new result starts with the previous result (ignoring case), 
+                // it's likely an expansion/correction of the same sentence.
+                // We replace the previous one with the new longer one.
+                if (lowerCurr.startsWith(lowerPrev)) {
+                    acc[acc.length - 1] = curr;
+                } else {
+                    acc.push(curr);
+                }
+                return acc;
+            }, []);
+
+            currentSessionFinal = uniqueFinals.join('\n\n');
 
             // Combine base transcript with current session's final result
             // Deduplication Logic:
